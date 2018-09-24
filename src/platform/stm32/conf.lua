@@ -4,7 +4,7 @@ addi( sf( 'src/platform/%s/FWLib/library/inc', platform ) )
 
 local fwlib_files = utils.get_files( "src/platform/" .. platform .. "/FWLib/library/src", ".*%.c$" )
 
-specific_files = "core_cm3.c system_stm32f10x.c startup_stm32f10x_hd.s platform.c stm32f10x_it.c lcd.c lua_lcd.c platform_int.c enc.c buzzer.c tft.c"
+specific_files = "core_cm3.c system_stm32f10x.c startup_stm32f10x_hd.s platform.c stm32f10x_it.c platform_int.c"
 
 local ldscript = "stm32.ld"
   
@@ -25,6 +25,7 @@ local target_flags = { '-mcpu=cortex-m3', '-mthumb' }
 
 -- Configure general flags for target
 addcf( { target_flags, '-mlittle-endian' } )
+addcf( { target_flags, '-DHSE_Value=12000000', '-Os' } )
 addlf( { target_flags, '-Wl,-e,Reset_Handler', '-Wl,-static' } )
 addaf( target_flags )
 

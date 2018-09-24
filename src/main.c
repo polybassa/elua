@@ -58,7 +58,7 @@ void boot_rpc( void )
   luaL_openlibs(L);  /* open libraries */
   
   // Set up UART for 8N1 w/ adjustable baud rate
-  platform_uart_setup( RPC_UART_ID, RPC_UART_SPEED, 8, PLATFORM_UART_PARITY_NONE, PLATFORM_UART_STOPBITS_1 );
+  platform_uart_setup( RPC_UART_ID, RPC_UART_SPEED, 9, PLATFORM_UART_PARITY_EVEN, PLATFORM_UART_STOPBITS_1 );
   
   // Start RPC Server
   lua_getglobal( L, "rpc" );

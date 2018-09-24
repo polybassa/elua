@@ -9,7 +9,8 @@
 #define INT_GPIO_NEGEDGE      ( ELUA_INT_FIRST_ID + 1 )
 #define INT_TMR_MATCH         ( ELUA_INT_FIRST_ID + 2 )
 #define INT_UART_RX           ( ELUA_INT_FIRST_ID + 3 )
-#define INT_ELUA_LAST         INT_UART_RX
+#define INT_CAN_RX            ( ELUA_INT_FIRST_ID + 4 ) 
+#define INT_ELUA_LAST         INT_CAN_RX
 
 #endif // #ifndef __PLATFORM_INTS_H__
 

@@ -4,6 +4,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "platform.h"
+#include "platform_ints.h"
 #include "auxmods.h"
 #include "lrotable.h"
 
@@ -18,6 +19,62 @@ static int can_setup( lua_State* L )
   clock = luaL_checkinteger( L, 2 );
   res = platform_can_setup( id, clock );
   lua_pushinteger( L, res );
+  return 1;
+}
+
+// Lua: result = off( id )
+static int can_off( lua_State* L )
+{
+  unsigned id;
+
+  id = luaL_checkinteger( L, 1 );
+  MOD_CHECK_ID( can, id );
+
+  platform_can_off( id );
+  return 1;
+}
+
+
+// Lua: interrupt( id, state )
+static int can_interrupt( lua_State* L )
+{
+  unsigned id;
+  u32 state;
+  
+  id = luaL_checkinteger( L, 1 );
+  MOD_CHECK_ID( can, id );
+  state = luaL_checkinteger( L, 2 );
+
+  if ( state > 1 )
+      return luaL_error( L, "only 0/1 are allowed as state" );
+
+  platform_can_interrupt( id, state );
+
+  return 1;
+}
+
+// Lua: filter( id, num, enable, canid, mask )
+static int can_filter( lua_State* L )
+{
+  int id, canid, mask;
+  u8 num, enable;
+
+  id = luaL_checkinteger( L, 1 );
+  MOD_CHECK_ID( can, id );
+  num = luaL_checkinteger( L, 2 );
+
+  enable = luaL_checkinteger( L, 3 );
+  canid = luaL_checkinteger( L, 4 );
+  mask = luaL_checkinteger (L, 5 );
+
+  if ( enable > 1 )
+    return luaL_error( L, "only 0/1 are allowed as enable" );
+
+  if ( num > 13 )
+      return luaL_error( L, "only filter numbers from 0-13 are allowed" );
+
+  platform_can_filter( id, num, enable, canid, mask );
+
   return 1;
 }
 
@@ -41,6 +98,54 @@ static int can_send( lua_State* L )
   else
     lua_pushboolean( L, 0 );
   
+  return 1;
+}
+
+// Lua: state = overrun( id )
+static int can_overrun( lua_State* L )
+{
+  int id;
+
+  id = luaL_checkinteger( L, 1 );
+  MOD_CHECK_ID( can, id );
+
+  if( platform_can_overrun( id ) == SET )
+    lua_pushboolean( L, 1 );
+  else
+    lua_pushboolean( L, 0 );
+
+  return 1;
+}
+
+// Lua: state = message_pending( id )
+static int can_message_pending( lua_State* L )
+{
+  int id;
+
+  id = luaL_checkinteger( L, 1 );
+  MOD_CHECK_ID( can, id );
+
+  if( platform_can_message_pending( id ) == SET )
+    lua_pushboolean( L, 1 );
+  else
+    lua_pushboolean( L, 0 );
+
+  return 1;
+}
+
+// Lua: state = fifo_full( id )
+static int can_fifo_full( lua_State* L )
+{
+  int id;
+
+  id = luaL_checkinteger( L, 1 );
+  MOD_CHECK_ID( can, id );
+
+  if( platform_can_fifo_full( id ) == SET )
+    lua_pushboolean( L, 1 );
+  else
+    lua_pushboolean( L, 0 );
+
   return 1;
 }
 
@@ -76,9 +181,16 @@ const LUA_REG_TYPE can_map[] =
   { LSTRKEY( "setup" ),  LFUNCVAL( can_setup ) },
   { LSTRKEY( "send" ),  LFUNCVAL( can_send ) },  
   { LSTRKEY( "recv" ),  LFUNCVAL( can_recv ) },
+  { LSTRKEY( "interrupt" ),  LFUNCVAL( can_interrupt ) },
+  { LSTRKEY( "off" ),  LFUNCVAL( can_off ) },
+  { LSTRKEY( "filter" ),  LFUNCVAL( can_filter ) },
+  { LSTRKEY( "overrun" ),  LFUNCVAL( can_overrun ) },
+  { LSTRKEY( "message_pending" ),  LFUNCVAL( can_message_pending ) },
+  { LSTRKEY( "fifo_full" ),  LFUNCVAL( can_fifo_full ) },
 #if LUA_OPTIMIZE_MEMORY > 0
   { LSTRKEY( "ID_STD" ), LNUMVAL( ELUA_CAN_ID_STD ) },
   { LSTRKEY( "ID_EXT" ), LNUMVAL( ELUA_CAN_ID_EXT ) },
+  { LSTRKEY( "INT_CAN_RX" ), LNUMVAL( INT_CAN_RX ) },
 #endif
   { LNILKEY, LNILVAL }
 };
@@ -93,6 +205,7 @@ LUALIB_API int luaopen_can( lua_State *L )
   // Module constants  
   MOD_REG_NUMBER( L, "ID_STD", ELUA_CAN_ID_STD );
   MOD_REG_NUMBER( L, "ID_EXT", ELUA_CAN_ID_EXT );
+  MOD_REG_NUMBER( L, "INT_CAN_RX", INT_CAN_RX );
   
   return 1;
 #endif // #if LUA_OPTIMIZE_MEMORY > 0  

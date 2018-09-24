@@ -13,6 +13,37 @@
 #define VTMR_TIMER_ID         ( -1 )
 #endif
 
+void USB_LP_CAN1_RX0_IRQHandler(void)
+{
+	platform_can_interrupt( 0,  0);
+
+	cmn_int_handler( INT_CAN_RX, 0);
+}
+
+// ****************************************************************************
+// Interrupt: INT_CAN_RX
+
+static int int_can_rx_get_status( elua_int_resnum resnum )
+{
+  return CAN_GetITStatus( CAN1, CAN_IT_FMP0 ) == SET ? 1 : 0;
+}
+
+static int int_can_rx_set_status( elua_int_resnum resnum, int status )
+{
+  int prev = int_can_rx_get_status( resnum );
+  CAN_ITConfig( CAN1, CAN_IT_FMP0, status == PLATFORM_CPU_ENABLE ? ENABLE : DISABLE );
+  return prev;
+}
+
+static int int_can_rx_get_flag( elua_int_resnum resnum, int clear )
+{
+  int status = CAN_GetFlagStatus( CAN1, CAN_IT_FMP0) == SET ? 1 : 0;
+  if( clear )
+    CAN_ClearFlag( CAN1, CAN_IT_FMP0);
+  return status;
+}
+
+
 // ****************************************************************************
 // Interrupt handlers
 
@@ -409,5 +440,6 @@ const elua_int_descriptor elua_int_table[ INT_ELUA_LAST ] =
   { int_gpio_posedge_set_status, int_gpio_posedge_get_status, int_gpio_posedge_get_flag },
   { int_gpio_negedge_set_status, int_gpio_negedge_get_status, int_gpio_negedge_get_flag },
   { int_tmr_match_set_status, int_tmr_match_get_status, int_tmr_match_get_flag },
-  { int_uart_rx_set_status, int_uart_rx_get_status, int_uart_rx_get_flag }  
+  { int_uart_rx_set_status, int_uart_rx_get_status, int_uart_rx_get_flag },
+  { int_can_rx_set_status, int_can_rx_get_status, int_can_rx_get_flag }
 };

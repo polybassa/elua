@@ -45,7 +45,8 @@ u32 platform_s_cpu_get_frequency();
   _C( INT_GPIO_POSEDGE ),     \
   _C( INT_GPIO_NEGEDGE ),     \
   _C( INT_TMR_MATCH ),        \
-  _C( INT_UART_RX ),
+  _C( INT_UART_RX ),	      \
+  _C( INT_CAN_RX ),
 
 #endif // #ifndef __CPU_STM32F103RE_H__
 

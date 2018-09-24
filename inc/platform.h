@@ -156,6 +156,12 @@ int platform_can_exists( unsigned id );
 u32 platform_can_setup( unsigned id, u32 clock );
 int platform_can_send( unsigned id, u32 canid, u8 idtype, u8 len, const u8 *data );
 int platform_can_recv( unsigned id, u32 *canid, u8 *idtype, u8 *len, u8 *data );
+void platform_can_interrupt(unsigned id, u8 state);
+int platform_can_fifo_full( unsigned id );
+int platform_can_message_pending( unsigned id );
+int platform_can_overrun( unsigned id );
+void platform_can_filter( unsigned id, u8 num, u8 enable, u32 filterId, u32 mask);
+void platform_can_off( unsigned id );
 
 // *****************************************************************************
 // SPI subsection
